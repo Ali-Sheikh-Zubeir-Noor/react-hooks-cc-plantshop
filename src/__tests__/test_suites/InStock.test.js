@@ -1,27 +1,20 @@
 import React from 'react';
-import { render, fireEvent, within } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import App from '../../components/App';
 import '@testing-library/jest-dom';
 
-describe('3rd Deliverable', () => {
+describe('In Stock', () => {
   test('marks a plant as sold out', async () => {
-    global.setFetchResponse(global.basePlants)
+    global.setFetchResponse(global.basePlants);
+    const { queryAllByTestId, getByText } = render(<App />);
 
-    const { findAllByTestId, findByText } = render(<App />);
+    const plantItems = queryAllByTestId('plant-item');
+    expect(plantItems).toHaveLength(global.basePlants.length);
 
-    // Get all plant items
-    const plantItems = await findAllByTestId('plant-item');
-    expect(plantItems).toHaveLength(basePlants.length);
+    const firstPlantMarkSoldOutButton = plantItems[0].querySelector('button');
+    fireEvent.click(firstPlantMarkSoldOutButton);
 
-    // Select the first plant item
-    const firstPlantItem = plantItems[0];
-
-    // Find and click the "In Stock" button within the first plant item
-    const inStockButton = within(firstPlantItem).getByText('In Stock');
-    fireEvent.click(inStockButton);
-
-    // Wait for the "Out of Stock" button to appear and verify its presence
-    const outOfStockButton = await findByText('Out of Stock');
-    expect(outOfStockButton).toBeInTheDocument();
+    // Check that the button text changes to 'Sold Out'
+    expect(firstPlantMarkSoldOutButton.textContent).toBe('Sold Out');
   });
-})
+});
